@@ -1,4 +1,4 @@
-import { HttpException } from "../exceptions/http.exception";
+import { TopicNotFoundError } from "../errors/domain.error";
 import { TopicFactory } from "../models/topic.model";
 import { InMemoryTopicPersistence } from "../persistence/in-memory-topic.persistence";
 
@@ -18,11 +18,7 @@ export class CreateTopicService {
         createTopicProps.parentTopicId
       );
       if (!parentTopic) {
-        throw new HttpException(404, "Bad Request", {
-          message: "Parent topic not found",
-          parentTopicId: createTopicProps.parentTopicId,
-          source: "CreateTopicService",
-        });
+        throw new TopicNotFoundError(createTopicProps.parentTopicId);
       }
     }
 

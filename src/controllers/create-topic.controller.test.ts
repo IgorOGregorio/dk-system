@@ -1,8 +1,7 @@
-
 import { createTopicController } from "./create-topic.controller";
 import { CreateTopicService } from "../services/create-topic.service";
 import { CreateTopicBody } from "../schemas/create-topic-body.schema";
-import { HttpException } from "../exceptions/http.exception";
+import { HttpException } from "../errors/http.error";
 
 // Mock the service dependency
 jest.mock("../services/create-topic.service");

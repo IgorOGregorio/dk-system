@@ -1,6 +1,6 @@
 import { CreateTopicService } from "./create-topic.service";
 import { InMemoryTopicPersistence } from "../persistence/in-memory-topic.persistence";
-import { HttpException } from "../exceptions/http.exception";
+import { HttpException } from "../errors/http.error";
 import { Topic, TopicFactory } from "../models/topic.model";
 import { randomUUID } from "node:crypto";
 

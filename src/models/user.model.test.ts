@@ -1,3 +1,4 @@
+import { UserVersionNotFoundError } from "../errors/domain.error";
 import {
   UserFactory,
   User,
@@ -25,15 +26,16 @@ describe("User Model with Design Patterns", () => {
       expect(user.role).toBe("Admin");
     });
 
-    it("should throw an error for an unknown user version", () => {
+    it("should throw an UserVersionNotFoundError for an unknown user version", () => {
       const userData = {
         id: "1",
         name: "John Doe",
         email: "john.doe@example.com",
         role: "Admin" as UserRole,
       };
+
       expect(() => UserFactory.create(userData, "2.0")).toThrow(
-        "User version 2.0 not found."
+        new UserVersionNotFoundError("2.0")
       );
     });
   });

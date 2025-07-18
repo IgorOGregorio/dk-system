@@ -1,5 +1,6 @@
 import { ZodObject, ZodError } from "zod";
 import { NextFunction, Request, Response } from "express";
+import { HttpError } from "../errors/http.error";
 
 export const validate =
   (schema: ZodObject) =>
@@ -14,12 +15,11 @@ export const validate =
     } catch (error) {
       let err = error;
       if (err instanceof ZodError) {
-        err = err.issues.map((e) => ({ path: e.path[0], message: e.message }));
+        err = err.issues.map((issue) => ({
+          path: issue.path,
+          message: issue.message,
+        }));
       }
-      return res.status(400).json({
-        status: 400,
-        message: "Validation error",
-        error: err,
-      });
+      next(new HttpError(400, "Validation error", err));
     }
   };

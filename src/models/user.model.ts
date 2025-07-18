@@ -1,3 +1,5 @@
+import { UserVersionNotFoundError } from "../errors/domain.error";
+
 // --- Enums and Types ---
 export type UserRole = "Admin" | "Editor" | "Viewer";
 export type UserAction =
@@ -123,7 +125,7 @@ export class UserFactory {
   ): User {
     const UserClass = this.userVersions[version];
     if (!UserClass) {
-      throw new Error(`User version ${version} not found.`);
+      throw new UserVersionNotFoundError(version);
     }
     return new UserClass(props);
   }

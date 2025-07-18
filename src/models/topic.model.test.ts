@@ -67,9 +67,8 @@ describe("Topic Model", () => {
 });
 
 describe("TopicFactory", () => {
-  it("should create a new topic", () => {
+  it("should create a new topic with a random id if not provided", () => {
     const topic = TopicFactory.create({
-      id: "1",
       name: "New Topic",
       content: "Content for the new topic.",
     });
@@ -77,7 +76,22 @@ describe("TopicFactory", () => {
     expect(topic).toBeInstanceOf(Topic);
     expect(topic.name).toBe("New Topic");
     expect(topic.version).toBe(1);
+    expect(topic.id).toEqual(expect.any(String));
   });
+
+  it("should create a new topic with the provided id", () => {
+    const topic = TopicFactory.create(
+      {
+        name: "New Topic",
+        content: "Content for the new topic.",
+      },
+      "custom-id"
+    );
+
+    expect(topic).toBeInstanceOf(Topic);
+    expect(topic.id).toBe("custom-id");
+  });
+
 
   it("should create a new version of a topic", () => {
     const originalTopic = new Topic({

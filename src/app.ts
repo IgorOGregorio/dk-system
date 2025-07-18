@@ -6,6 +6,7 @@ import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./swagger";
 import appRouter from "./routes/app.route";
 import errorMiddleware from "./middlewares/error.middleware";
+import topicRouter from "./routes/topic.routes";
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(
 app.use(helmet());
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/", appRouter);
+app.use("/topics", topicRouter);
 
 app.use(errorMiddleware);
 export default app;

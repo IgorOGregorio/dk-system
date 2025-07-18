@@ -1,6 +1,6 @@
-
-
 // --- Composite Pattern (Topic Hierarchy) ---
+
+import { randomUUID } from "node:crypto";
 
 export interface TopicComponent {
   id: string;
@@ -72,19 +72,18 @@ export class Topic implements TopicComponent {
 // --- Factory Pattern (Topic Creation) ---
 
 export class TopicFactory {
-  static create(props: {
-    id: string;
-    name: string;
-    content: string;
-    parentTopicId?: string;
-  }): Topic {
-    return new Topic(props);
+  static create(
+    props: {
+      name: string;
+      content: string;
+      parentTopicId?: string;
+    },
+    id?: string
+  ): Topic {
+    return new Topic({ id: id ?? randomUUID(), ...props });
   }
 
-  static createVersion(
-    originalTopic: Topic,
-    updatedContent: string
-  ): Topic {
+  static createVersion(originalTopic: Topic, updatedContent: string): Topic {
     const newVersion = originalTopic.version + 1;
     return new Topic({
       ...originalTopic,
@@ -94,4 +93,3 @@ export class TopicFactory {
     });
   }
 }
-

@@ -1,7 +1,7 @@
 import { createTopicController } from "./create-topic.controller";
 import { CreateTopicService } from "../services/create-topic.service";
 import { CreateTopicBody } from "../schemas/create-topic-body.schema";
-import { HttpException } from "../errors/http.error";
+import { HttpError } from "../errors/http.error";
 
 // Mock the service dependency
 jest.mock("../services/create-topic.service");
@@ -44,7 +44,7 @@ describe("CreateTopicController", () => {
       content: "This should fail.",
     };
 
-    const expectedError = new HttpException(400, "Bad Request", {
+    const expectedError = new HttpError(400, "Bad Request", {
       message: "Invalid input",
     });
 
@@ -53,7 +53,7 @@ describe("CreateTopicController", () => {
 
     // Expect the controller's handle method to reject with the same error
     await expect(createTopicController.handle(topicBody)).rejects.toThrow(
-      HttpException
+      HttpError
     );
     await expect(createTopicController.handle(topicBody)).rejects.toEqual(
       expectedError

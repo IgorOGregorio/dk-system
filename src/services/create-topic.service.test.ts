@@ -1,21 +1,19 @@
 import { CreateTopicService } from "./create-topic.service";
-import { InMemoryTopicPersistence } from "../persistence/in-memory-topic.persistence";
 import { Topic, TopicFactory } from "../models/topic.model";
 import { randomUUID } from "node:crypto";
 import { TopicNotFoundError } from "../errors/domain.error";
-
-// Mock the persistence layer
-jest.mock("../persistence/in-memory-topic.persistence");
+import { ITopicRepository } from "../repositories/itopic.repository";
 
 describe("CreateTopicService", () => {
-  let topicPersistenceMock: jest.Mocked<InMemoryTopicPersistence>;
+  let topicRepositoryMock: jest.Mocked<ITopicRepository>;
   let createTopicService: CreateTopicService;
 
   beforeEach(() => {
-    // Create a mock instance of the persistence layer
-    topicPersistenceMock =
-      new InMemoryTopicPersistence() as jest.Mocked<InMemoryTopicPersistence>;
-    createTopicService = new CreateTopicService(topicPersistenceMock);
+    topicRepositoryMock = {
+      create: jest.fn(),
+      findById: jest.fn(),
+    } as unknown as jest.Mocked<ITopicRepository>;
+    createTopicService = new CreateTopicService(topicRepositoryMock);
   });
 
   afterEach(() => {
@@ -29,16 +27,16 @@ describe("CreateTopicService", () => {
     };
 
     // Mock the create method to resolve successfully
-    topicPersistenceMock.create.mockResolvedValue(undefined);
+    topicRepositoryMock.create.mockResolvedValue(undefined);
 
     await createTopicService.execute(topicProps);
 
     // Verify that the create method was called
-    expect(topicPersistenceMock.create).toHaveBeenCalledTimes(1);
+    expect(topicRepositoryMock.create).toHaveBeenCalledTimes(1);
     // Verify that it was called with a Topic instance
-    expect(topicPersistenceMock.create).toHaveBeenCalledWith(expect.any(Topic));
+    expect(topicRepositoryMock.create).toHaveBeenCalledWith(expect.any(Topic));
     // Optionally, check the properties of the topic passed to create
-    const createdTopic = topicPersistenceMock.create.mock.calls[0][0] as Topic;
+    const createdTopic = topicRepositoryMock.create.mock.calls[0][0] as Topic;
     expect(createdTopic.name).toBe(topicProps.name);
     expect(createdTopic.content).toBe(topicProps.content);
   });
@@ -59,19 +57,19 @@ describe("CreateTopicService", () => {
     };
 
     // Mock findById to return the parent topic
-    topicPersistenceMock.findById.mockResolvedValue(parentTopic);
+    topicRepositoryMock.findById.mockResolvedValue(parentTopic);
     // Mock create to resolve successfully
-    topicPersistenceMock.create.mockResolvedValue(undefined);
+    topicRepositoryMock.create.mockResolvedValue(undefined);
 
     await createTopicService.execute(topicProps);
 
     // Verify findById was called
-    expect(topicPersistenceMock.findById).toHaveBeenCalledTimes(1);
-    expect(topicPersistenceMock.findById).toHaveBeenCalledWith(parentTopic.id);
+    expect(topicRepositoryMock.findById).toHaveBeenCalledTimes(1);
+    expect(topicRepositoryMock.findById).toHaveBeenCalledWith(parentTopic.id);
 
     // Verify create was called
-    expect(topicPersistenceMock.create).toHaveBeenCalledTimes(1);
-    const createdTopic = topicPersistenceMock.create.mock.calls[0][0] as Topic;
+    expect(topicRepositoryMock.create).toHaveBeenCalledTimes(1);
+    const createdTopic = topicRepositoryMock.create.mock.calls[0][0] as Topic;
     expect(createdTopic.name).toBe(topicProps.name);
     expect(createdTopic.parentTopicId).toBe(parentTopic.id);
   });
@@ -84,18 +82,18 @@ describe("CreateTopicService", () => {
     };
 
     // Mock findById to return null
-    topicPersistenceMock.findById.mockResolvedValue(null);
+    topicRepositoryMock.findById.mockResolvedValue(null);
 
     await expect(createTopicService.execute(topicProps)).rejects.toThrow(
       new TopicNotFoundError(topicProps.parentTopicId)
     );
 
     // Verify findById was called
-    expect(topicPersistenceMock.findById).toHaveBeenCalledTimes(1);
-    expect(topicPersistenceMock.findById).toHaveBeenCalledWith(
+    expect(topicRepositoryMock.findById).toHaveBeenCalledTimes(1);
+    expect(topicRepositoryMock.findById).toHaveBeenCalledWith(
       "non-existent-id"
     );
     // Verify create was NOT called
-    expect(topicPersistenceMock.create).not.toHaveBeenCalled();
+    expect(topicRepositoryMock.create).not.toHaveBeenCalled();
   });
 });

@@ -1,4 +1,3 @@
-import { HttpException } from "../errors/http.error";
 import { Topic, TopicFactory } from "../models/topic.model";
 import { ITopicRepository } from "../repositories/itopic.repository";
 
@@ -13,7 +12,17 @@ type TopicTable = {
 };
 
 export class InMemoryTopicPersistence implements ITopicRepository {
-  private topics: TopicTable[] = [];
+  private topics: TopicTable[] = [
+    {
+      id: "f7b1b3b4-4b3b-4b3b-4b3b-4b3b4b3b4b3b",
+      name: "Introduction to Design Patterns",
+      content: "This topic covers the basics of various design patterns.",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      version: 1,
+      parentTopicId: undefined,
+    },
+  ];
 
   async create(topic: Topic): Promise<void> {
     this.topics.push({
@@ -43,7 +52,6 @@ export class InMemoryTopicPersistence implements ITopicRepository {
     if (index > -1) {
       this.topics[index] = topic;
     }
-    throw new HttpException(404, "Topic not found", {});
   }
 
   async delete(id: string): Promise<void> {

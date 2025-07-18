@@ -1,6 +1,6 @@
 import { TopicNotFoundError } from "../errors/domain.error";
 import { TopicFactory } from "../models/topic.model";
-import { InMemoryTopicPersistence } from "../persistence/in-memory-topic.persistence";
+import { ITopicRepository } from "../repositories/itopic.repository";
 
 type CreateTopicProps = {
   name: string;
@@ -9,12 +9,12 @@ type CreateTopicProps = {
 };
 
 export class CreateTopicService {
-  constructor(private topicPersistence: InMemoryTopicPersistence) {}
+  constructor(private topicRepository: ITopicRepository) {}
 
   async execute(createTopicProps: CreateTopicProps): Promise<void> {
     //if parentTopicId, validate
     if (createTopicProps.parentTopicId) {
-      const parentTopic = await this.topicPersistence.findById(
+      const parentTopic = await this.topicRepository.findById(
         createTopicProps.parentTopicId
       );
       if (!parentTopic) {
@@ -24,6 +24,6 @@ export class CreateTopicService {
 
     const topic = TopicFactory.create(createTopicProps);
 
-    await this.topicPersistence.create(topic);
+    await this.topicRepository.create(topic);
   }
 }

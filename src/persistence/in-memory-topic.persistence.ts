@@ -1,4 +1,4 @@
-import { HttpException } from "../exceptions/http.exception";
+import { HttpException } from "../errors/http.error";
 import { Topic, TopicFactory } from "../models/topic.model";
 import { ITopicRepository } from "../repositories/itopic.repository";
 

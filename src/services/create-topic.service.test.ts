@@ -1,8 +1,8 @@
 import { CreateTopicService } from "./create-topic.service";
 import { InMemoryTopicPersistence } from "../persistence/in-memory-topic.persistence";
-import { HttpException } from "../exceptions/http.exception";
 import { Topic, TopicFactory } from "../models/topic.model";
 import { randomUUID } from "node:crypto";
+import { TopicNotFoundError } from "../errors/domain.error";
 
 // Mock the persistence layer
 jest.mock("../persistence/in-memory-topic.persistence");
@@ -76,7 +76,7 @@ describe("CreateTopicService", () => {
     expect(createdTopic.parentTopicId).toBe(parentTopic.id);
   });
 
-  it("should throw an HttpException if parent topic is not found", async () => {
+  it("should throw an TopicNotFoundError if parent topic is not found", async () => {
     const topicProps = {
       name: "Child Topic",
       content: "This is a child topic.",
@@ -87,7 +87,7 @@ describe("CreateTopicService", () => {
     topicPersistenceMock.findById.mockResolvedValue(null);
 
     await expect(createTopicService.execute(topicProps)).rejects.toThrow(
-      HttpException
+      new TopicNotFoundError(topicProps.parentTopicId)
     );
 
     // Verify findById was called
@@ -97,33 +97,5 @@ describe("CreateTopicService", () => {
     );
     // Verify create was NOT called
     expect(topicPersistenceMock.create).not.toHaveBeenCalled();
-  });
-
-  it("should throw an HttpException with correct details when parent topic not found", async () => {
-    const topicProps = {
-      name: "Child Topic",
-      content: "This is a child topic.",
-      parentTopicId: "non-existent-id",
-    };
-
-    // Mock findById to return null
-    topicPersistenceMock.findById.mockResolvedValue(null);
-
-    try {
-      await createTopicService.execute(topicProps);
-      // Fail test if it doesn't throw
-      fail("Expected CreateTopicService.execute to throw, but it did not.");
-    } catch (error) {
-      expect(error).toBeInstanceOf(HttpException);
-      if (error instanceof HttpException) {
-        expect(error.status).toBe(404);
-        expect(error.message).toBe("Bad Request");
-        expect(error.details).toEqual({
-          message: "Parent topic not found",
-          parentTopicId: "non-existent-id",
-          source: "CreateTopicService",
-        });
-      }
-    }
   });
 });

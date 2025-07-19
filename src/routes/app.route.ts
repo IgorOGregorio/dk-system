@@ -1,5 +1,4 @@
 import { NextFunction, Router, Request, Response } from "express";
-import { HttpException } from "../errors/http.error";
 
 const appRouter = Router();
 

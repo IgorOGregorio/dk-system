@@ -1,26 +1,17 @@
-import { createTopicController } from "./create-topic.controller";
+import { CreateTopicController } from "./create-topic.controller";
 import { CreateTopicService } from "../services/create-topic.service";
 import { CreateTopicBody } from "../schemas/create-topic-body.schema";
-import { HttpError } from "../errors/http.error";
-
-// Mock the service dependency
-jest.mock("../services/create-topic.service");
+import { TopicNotFoundError } from "../errors/domain.error";
 
 describe("CreateTopicController", () => {
-  let executeSpy: jest.SpyInstance;
+  let createTopicServiceMock: jest.Mocked<CreateTopicService>;
+  let createTopicController: CreateTopicController;
 
   beforeEach(() => {
-    // Spy on the execute method of the CreateTopicService prototype
-    executeSpy = jest.spyOn(CreateTopicService.prototype, "execute");
-  });
-
-  afterEach(() => {
-    // Restore the original method after each test
-    executeSpy.mockRestore();
-  });
-
-  it("should be defined", () => {
-    expect(createTopicController).toBeDefined();
+    createTopicServiceMock = {
+      execute: jest.fn(),
+    } as any;
+    createTopicController = new CreateTopicController(createTopicServiceMock);
   });
 
   it("should call the service's execute method with the correct body", async () => {
@@ -29,33 +20,26 @@ describe("CreateTopicController", () => {
       content: "This is some test content.",
     };
 
-    // Set up the mock to resolve successfully
-    executeSpy.mockResolvedValue(undefined);
+    createTopicServiceMock.execute.mockResolvedValue(undefined);
 
     await createTopicController.handle(topicBody);
 
-    expect(executeSpy).toHaveBeenCalledTimes(1);
-    expect(executeSpy).toHaveBeenCalledWith(topicBody);
+    expect(createTopicServiceMock.execute).toHaveBeenCalledTimes(1);
+    expect(createTopicServiceMock.execute).toHaveBeenCalledWith(topicBody);
   });
 
   it("should propagate errors from the service", async () => {
     const topicBody: CreateTopicBody = {
       name: "Error Topic",
       content: "This should fail.",
+      parentTopicId: "non-existent-id",
     };
 
-    const expectedError = new HttpError(400, "Bad Request", {
-      message: "Invalid input",
-    });
+    const expectedError = new TopicNotFoundError(topicBody.parentTopicId || "");
 
-    // Set up the mock to reject with a specific error
-    executeSpy.mockRejectedValue(expectedError);
+    createTopicServiceMock.execute.mockRejectedValue(expectedError);
 
-    // Expect the controller's handle method to reject with the same error
     await expect(createTopicController.handle(topicBody)).rejects.toThrow(
-      HttpError
-    );
-    await expect(createTopicController.handle(topicBody)).rejects.toEqual(
       expectedError
     );
   });

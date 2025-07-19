@@ -7,7 +7,7 @@ type TopicTable = {
   content: string;
   createdAt: Date;
   updatedAt: Date;
-  version: number;
+  version: string;
   parentTopicId?: string;
 };
 
@@ -21,7 +21,7 @@ export class InMemoryTopicPersistence implements ITopicRepository {
       content: "This topic covers the basics of various design patterns.",
       createdAt: new Date(),
       updatedAt: new Date(),
-      version: 1,
+      version: "1",
       parentTopicId: undefined,
     });
   }

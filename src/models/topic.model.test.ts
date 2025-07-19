@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { Topic, TopicFactory, TopicComponent } from "./topic.model";
 
 describe("Topic Model", () => {
@@ -11,7 +12,7 @@ describe("Topic Model", () => {
     expect(topic.id).toBe("1");
     expect(topic.name).toBe("Main Topic");
     expect(topic.content).toBe("This is the main topic.");
-    expect(topic.version).toBe(1);
+    expect(topic.version).toBe("1");
     expect(topic.createdAt).toBeInstanceOf(Date);
     expect(topic.updatedAt).toBeInstanceOf(Date);
   });
@@ -26,18 +27,21 @@ describe("Topic Model", () => {
         id: "1",
         name: "Main Topic",
         content: "Content of the main topic.",
+        version: "1",
       });
       subTopic1 = new Topic({
         id: "2",
         name: "Sub Topic 1",
         content: "Content of sub topic 1.",
         parentTopicId: "1",
+        version: "1.1",
       });
       subTopic2 = new Topic({
         id: "3",
         name: "Sub Topic 2",
         content: "Content of sub topic 2.",
         parentTopicId: "1",
+        version: "1.2",
       });
 
       mainTopic.add(subTopic1);
@@ -75,7 +79,7 @@ describe("TopicFactory", () => {
 
     expect(topic).toBeInstanceOf(Topic);
     expect(topic.name).toBe("New Topic");
-    expect(topic.version).toBe(1);
+    expect(topic.version).toBe("1");
     expect(topic.id).toEqual(expect.any(String));
   });
 
@@ -92,24 +96,33 @@ describe("TopicFactory", () => {
     expect(topic.id).toBe("custom-id");
   });
 
-
   it("should create a new version of a topic", () => {
-    const originalTopic = new Topic({
-      id: "1",
+    const originalTopic = TopicFactory.create({
       name: "Original Topic",
       content: "Original content.",
     });
 
-    const updatedContent = "Updated content.";
+    const updatedData = {
+      name: "Updated Topic",
+      content: "Updated content.",
+    };
     const newVersionTopic = TopicFactory.createVersion(
       originalTopic,
-      updatedContent
+      updatedData
     );
 
-    expect(newVersionTopic.id).toBe(originalTopic.id);
-    expect(newVersionTopic.name).toBe(originalTopic.name);
-    expect(newVersionTopic.content).toBe(updatedContent);
-    expect(newVersionTopic.version).toBe(originalTopic.version + 1);
-    expect(newVersionTopic.updatedAt).not.toBe(originalTopic.updatedAt);
+    expect(newVersionTopic.version).toBe(`${originalTopic.version}.1`);
+
+    const updatedData2 = {
+      name: "Updated Topic 2",
+      content: "Updated content 2.",
+    };
+    const newVersionTopic2 = TopicFactory.createVersion(
+      originalTopic,
+      updatedData2
+    );
+
+    expect(newVersionTopic2.version).toBe(`${originalTopic.version}.2`);
   });
 });
+

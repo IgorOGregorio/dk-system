@@ -4,6 +4,7 @@ export interface ITopicRepository {
   create(topic: Topic): Promise<void>;
   findById(id: string): Promise<Topic | null>;
   findAll(): Promise<Topic[]>;
+  findAllSubtopics(parentTopicId: string): Promise<Topic[]>;
   update(topic: Topic): Promise<void>;
   delete(id: string): Promise<void>;
 }

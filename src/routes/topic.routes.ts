@@ -4,9 +4,81 @@ import {
   CreateTopicBody,
   createTopicBody,
 } from "../schemas/create-topic-body.schema";
-import { createTopicController } from "../controllers/create-topic.controller";
+import { findTopicByIdController, createTopicController } from "..";
 
 const topicRouter = Router();
+
+/**
+ * @swagger
+ * /topics/{id}:
+ *   get:
+ *     summary: Retrieve a single topic by ID
+ *     tags: [Topics]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the topic to retrieve
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *           example: "f7b1b3b4-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
+ *     responses:
+ *       200:
+ *         description: A single topic object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   example: "123e4567-e89b-12d3-a456-426614174000"
+ *                 name:
+ *                   type: string
+ *                   example: Introduction to Design Patterns
+ *                 content:
+ *                   type: string
+ *                   example: This topic covers the basics of various design patterns.
+ *                 parentTopicId:
+ *                   type: string
+ *                   nullable: true
+ *                   example: "f7b1b3b4-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
+ *                 subtopics:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Content of subtopic 1", "Content of subtopic 2"]
+ *       404:
+ *         description: Topic not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Topic not found"
+ *                 details:
+ *                   type: object
+ *                   properties:
+ *                     topicId:
+ *                       type: string
+ *                       example: "non-existent-id"
+ */
+
+topicRouter.get(
+  "/:id",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const topicId = req.params.id;
+      const topic = await findTopicByIdController.handle(topicId);
+      res.status(200).json(topic);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 /**
  * @swagger
@@ -91,7 +163,6 @@ topicRouter.post(
       await createTopicController.handle(req.body as CreateTopicBody);
       res.status(201).send();
     } catch (error) {
-      // Pass the error to the Express error-handling middleware
       next(error);
     }
   }

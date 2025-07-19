@@ -1,5 +1,4 @@
-import { randomUUID } from "node:crypto";
-import { Topic, TopicFactory, TopicComponent } from "./topic.model";
+import { Topic, TopicFactory } from "./topic.model";
 
 describe("Topic Model", () => {
   it("should create a topic with the correct properties", () => {

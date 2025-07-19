@@ -1,6 +1,6 @@
 import { FindTopicByIdController } from "./find-topic-by-id.controller";
 import { FindTopicByIdService } from "../services/find-topic-by-id.service";
-import { Topic, TopicFactory } from "../models/topic.model";
+import { TopicFactory } from "../models/topic.model";
 import { randomUUID } from "node:crypto";
 import { TopicNotFoundError } from "../errors/domain.error";
 
@@ -48,4 +48,3 @@ describe("FindTopicByIdController", () => {
     expect(findTopicByIdServiceMock.execute).toHaveBeenCalledTimes(1);
   });
 });
-

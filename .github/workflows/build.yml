@@ -28,3 +28,25 @@ jobs:
       #   timeout-minutes: 5
       #   env:
       #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  tests:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Check out your repository code
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # 2. Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18" # Specify your Node.js version
+          cache: "npm"
+
+      # 3. Install project dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Run Unit Tests
+      - name: Run unit test
+        run: npm run test

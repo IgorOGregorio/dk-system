@@ -21,3 +21,9 @@ export class UserVersionNotFoundError extends DomainError {
     super(`User version ${version} not found.`, { version });
   }
 }
+
+export class TopicVersionNotFoundError extends DomainError {
+  constructor(version: string) {
+    super(`Topic version ${version} not found.`, { version });
+  }
+}

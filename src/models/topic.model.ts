@@ -20,7 +20,7 @@ export class Topic implements TopicComponent {
   updatedAt: Date;
   version: string;
   parentTopicId?: string;
-  private subTopics: TopicComponent[] = [];
+  private subTopics: Topic[] = [];
 
   constructor(props: {
     id: string;
@@ -41,7 +41,7 @@ export class Topic implements TopicComponent {
   }
 
   // --- Composite Methods ---
-  add(topic: TopicComponent): void {
+  add(topic: Topic): void {
     this.subTopics.push(topic);
   }
 
@@ -65,7 +65,7 @@ export class Topic implements TopicComponent {
     return combinedContent;
   }
 
-  getSubTopics(): TopicComponent[] {
+  getSubTopics(): Topic[] {
     return this.subTopics;
   }
 }

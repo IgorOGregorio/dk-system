@@ -27,3 +27,9 @@ export class TopicVersionNotFoundError extends DomainError {
     super(`Topic version ${version} not found.`, { version });
   }
 }
+
+export class TopicHasSubtopicsError extends DomainError {
+  constructor(topicId: string) {
+    super("Topic has subtopics and cannot be deleted.", { topicId });
+  }
+}

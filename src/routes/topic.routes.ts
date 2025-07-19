@@ -9,6 +9,7 @@ import {
   createTopicController,
   updateTopicController,
   findTopicByVersionController,
+  deleteTopicController,
 } from "..";
 import { UpdateTopicBodySchema } from "../schemas/update-topic-body.schema";
 
@@ -327,6 +328,56 @@ topicRouter.put(
         updateTopicDto
       );
       res.status(201).json(updatedTopic);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+/**
+ * @swagger
+ * /topics/{id}:
+ *   delete:
+ *     summary: Delete a topic by ID
+ *     tags: [Topics]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the topic to delete
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *           example: "f7b1b3b4-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
+ *     responses:
+ *       204:
+ *         description: Topic deleted successfully.
+ *       400:
+ *         description: Bad request, e.g., topic has subtopics.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/BadRequestError'
+ *       404:
+ *         description: Topic not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/NotFoundError'
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/InternalServerError'
+ */
+topicRouter.delete(
+  "/:id",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const topicId = req.params.id;
+      await deleteTopicController.handle(topicId);
+      res.status(204).send();
     } catch (error) {
       next(error);
     }

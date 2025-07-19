@@ -1,7 +1,8 @@
 import { CreateTopicController } from "./create-topic.controller";
 import { CreateTopicService } from "../services/create-topic.service";
-import { CreateTopicBody } from "../schemas/create-topic-body.schema";
+import { CreateTopicDto } from "../dtos/create-topic.dto";
 import { TopicNotFoundError } from "../errors/domain.error";
+import { Topic, TopicFactory } from "../models/topic.model";
 
 describe("CreateTopicController", () => {
   let createTopicServiceMock: jest.Mocked<CreateTopicService>;
@@ -14,32 +15,34 @@ describe("CreateTopicController", () => {
     createTopicController = new CreateTopicController(createTopicServiceMock);
   });
 
-  it("should call the service's execute method with the correct body", async () => {
-    const topicBody: CreateTopicBody = {
+  it("should call the service and return the created topic", async () => {
+    const topicDto: CreateTopicDto = {
       name: "Test Topic",
       content: "This is some test content.",
     };
+    const expectedTopic = TopicFactory.create(topicDto);
 
-    createTopicServiceMock.execute.mockResolvedValue(undefined);
+    createTopicServiceMock.execute.mockResolvedValue(expectedTopic);
 
-    await createTopicController.handle(topicBody);
+    const result = await createTopicController.handle(topicDto);
 
     expect(createTopicServiceMock.execute).toHaveBeenCalledTimes(1);
-    expect(createTopicServiceMock.execute).toHaveBeenCalledWith(topicBody);
+    expect(createTopicServiceMock.execute).toHaveBeenCalledWith(topicDto);
+    expect(result).toBe(expectedTopic);
+    expect(result.name).toBe(topicDto.name);
   });
 
   it("should propagate errors from the service", async () => {
-    const topicBody: CreateTopicBody = {
+    const topicDto: CreateTopicDto = {
       name: "Error Topic",
       content: "This should fail.",
-      parentTopicId: "non-existent-id",
     };
 
-    const expectedError = new TopicNotFoundError(topicBody.parentTopicId || "");
+    const expectedError = new TopicNotFoundError("some-id");
 
     createTopicServiceMock.execute.mockRejectedValue(expectedError);
 
-    await expect(createTopicController.handle(topicBody)).rejects.toThrow(
+    await expect(createTopicController.handle(topicDto)).rejects.toThrow(
       expectedError
     );
   });

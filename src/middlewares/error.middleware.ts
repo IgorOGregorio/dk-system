@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import {
+  TopicHasSubtopicsError,
   TopicNotFoundError,
   TopicVersionNotFoundError,
 } from "../errors/domain.error";
@@ -22,6 +23,14 @@ function errorMiddleware(
 
   if (error instanceof TopicVersionNotFoundError) {
     const status = 404;
+    const message = error.message;
+    const details = (error as any).details;
+    console.log(`[Domain Error] ${status}: ${message}`, details);
+    return res.status(status).json({ status, message, details });
+  }
+
+  if (error instanceof TopicHasSubtopicsError) {
+    const status = 400;
     const message = error.message;
     const details = (error as any).details;
     console.log(`[Domain Error] ${status}: ${message}`, details);

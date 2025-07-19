@@ -65,5 +65,10 @@ export class InMemoryTopicPersistence implements ITopicRepository {
     }
   }
 
-  async delete(id: string): Promise<void> {}
+  async delete(id: string): Promise<void> {
+    const index = topics.findIndex((t) => t.id === id);
+    if (index > -1) {
+      topics.splice(index, 1);
+    }
+  }
 }

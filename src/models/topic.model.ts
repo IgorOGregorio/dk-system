@@ -5,6 +5,7 @@ import { randomUUID } from "node:crypto";
 export interface TopicComponent {
   id: string;
   name: string;
+  version: string;
   display(indent?: string): void;
   get allContent(): string;
 }
@@ -17,7 +18,7 @@ export class Topic implements TopicComponent {
   content: string;
   createdAt: Date;
   updatedAt: Date;
-  version: number;
+  version: string;
   parentTopicId?: string;
   private subTopics: TopicComponent[] = [];
 
@@ -27,7 +28,7 @@ export class Topic implements TopicComponent {
     content: string;
     createdAt?: Date;
     updatedAt?: Date;
-    version?: number;
+    version?: string;
     parentTopicId?: string;
   }) {
     this.id = props.id;
@@ -35,7 +36,7 @@ export class Topic implements TopicComponent {
     this.content = props.content;
     this.createdAt = props.createdAt || new Date();
     this.updatedAt = props.updatedAt || new Date();
-    this.version = props.version || 1;
+    this.version = props.version || "1";
     this.parentTopicId = props.parentTopicId;
   }
 
@@ -76,20 +77,43 @@ export class TopicFactory {
     props: {
       name: string;
       content: string;
-      parentTopicId?: string;
     },
     id?: string
   ): Topic {
     return new Topic({ id: id ?? randomUUID(), ...props });
   }
 
-  static createVersion(originalTopic: Topic, updatedContent: string): Topic {
-    const newVersion = originalTopic.version + 1;
-    return new Topic({
-      ...originalTopic,
-      content: updatedContent,
+  static createVersion(
+    originalTopic: Topic,
+    updatedData: {
+      name: string;
+      content: string;
+    }
+  ): Topic {
+    const subTopics = originalTopic.getSubTopics();
+    let newVersion: string;
+
+    if (subTopics.length > 0) {
+      const lastSubtopic = subTopics[subTopics.length - 1];
+      const lastVersionString = lastSubtopic.version;
+      const versionParts = lastVersionString.split(".");
+      const lastPart = parseInt(versionParts[versionParts.length - 1], 10);
+      versionParts[versionParts.length - 1] = (lastPart + 1).toString();
+      newVersion = versionParts.join(".");
+    } else {
+      newVersion = `${originalTopic.version}.1`;
+    }
+
+    const newTopic = new Topic({
+      id: randomUUID(),
+      ...updatedData,
+      parentTopicId: originalTopic.id,
       version: newVersion,
+      createdAt: new Date(),
       updatedAt: new Date(),
     });
+
+    originalTopic.add(newTopic);
+    return newTopic;
   }
 }

@@ -1,10 +1,12 @@
 import { CreateTopicController } from "./controllers/create-topic.controller";
 import { FindTopicByIdController } from "./controllers/find-topic-by-id.controller";
+import { FindTopicByVersionController } from "./controllers/find-topic-by-version.controller";
 import { UpdateTopicController } from "./controllers/update-topic.controller";
 import { InMemoryTopicPersistence } from "./persistence/in-memory-topic.persistence";
 import { CreateTopicService } from "./services/create-topic.service";
 import { FindSubtopicsRecursiveService } from "./services/find-subtopics-recursive.service";
 import { FindTopicByIdService } from "./services/find-topic-by-id.service";
+import { FindTopicByVersionService } from "./services/find-topic-by-version.service";
 import { UpdateTopicService } from "./services/update-topic.service";
 
 //repositories
@@ -24,6 +26,11 @@ const updateTopicService = new UpdateTopicService(
   findSubtopicsRecursiveService
 );
 
+const findTopicByVersionService = new FindTopicByVersionService(
+  topicRepository,
+  findSubtopicsRecursiveService
+);
+
 //constrollers
 export const updateTopicController = new UpdateTopicController(
   updateTopicService
@@ -35,4 +42,8 @@ export const findTopicByIdController = new FindTopicByIdController(
 
 export const createTopicController = new CreateTopicController(
   createTopicService
+);
+
+export const findTopicByVersionController = new FindTopicByVersionController(
+  findTopicByVersionService
 );

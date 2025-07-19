@@ -1,5 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { TopicNotFoundError } from "../errors/domain.error";
+import {
+  TopicNotFoundError,
+  TopicVersionNotFoundError,
+} from "../errors/domain.error";
 import { HttpError } from "../errors/http.error";
 
 function errorMiddleware(
@@ -14,6 +17,14 @@ function errorMiddleware(
     const message = error.message;
     const details = (error as any).details;
     console.error(`[Domain Error] ${status}: ${message}`, details);
+    return res.status(status).json({ status, message, details });
+  }
+
+  if (error instanceof TopicVersionNotFoundError) {
+    const status = 404;
+    const message = error.message;
+    const details = (error as any).details;
+    console.log(`[Domain Error] ${status}: ${message}`, details);
     return res.status(status).json({ status, message, details });
   }
 

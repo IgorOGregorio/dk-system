@@ -125,4 +125,3 @@ describe("TopicFactory", () => {
     expect(newVersionTopic2.version).toBe(`${originalTopic.version}.2`);
   });
 });
-

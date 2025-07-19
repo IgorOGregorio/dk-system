@@ -8,6 +8,7 @@ import {
   findTopicByIdController,
   createTopicController,
   updateTopicController,
+  findTopicByVersionController,
 } from "..";
 import { UpdateTopicBodySchema } from "../schemas/update-topic-body.schema";
 
@@ -115,26 +116,7 @@ const topicRouter = Router();
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                   example: "123e4567-e89b-12d3-a456-426614174000"
- *                 name:
- *                   type: string
- *                   example: Introduction to Design Patterns
- *                 content:
- *                   type: string
- *                   example: This topic covers the basics of various design patterns.
- *                 parentTopicId:
- *                   type: string
- *                   nullable: true
- *                   example: "f7b1b3b4-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
- *                 subtopics:
- *                   type: array
- *                   items:
- *                     type: string
- *                   example: ["Content of subtopic 1", "Content of subtopic 2"]
+ *               $ref: '#/components/schemas/Topic'
  *       404:
  *         description: Topic not found
  *         content:
@@ -149,6 +131,56 @@ topicRouter.get(
     try {
       const topicId = req.params.id;
       const topic = await findTopicByIdController.handle(topicId);
+      res.status(200).json(topic);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+/**
+ * @swagger
+ * /topics/version/{id}/{version}:
+ *   get:
+ *     summary: Retrieve a specific version of a topic by ID
+ *     tags: [Topics]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the topic to retrieve
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *           example: "f7b1b3b4-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
+ *       - in: path
+ *         name: version
+ *         required: true
+ *         description: Version of the topic to retrieve
+ *         schema:
+ *           type: string
+ *           example: "1.0"
+ *     responses:
+ *       200:
+ *         description: A single topic object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Topic'
+ *       404:
+ *         description: Topic with this version not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/NotFoundError'
+ *  */
+topicRouter.get(
+  "/version/:id/:version",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const topicId = req.params.id;
+      const version = req.params.version;
+      const topic = await findTopicByVersionController.handle(topicId, version);
       res.status(200).json(topic);
     } catch (error) {
       next(error);
@@ -189,32 +221,11 @@ topicRouter.get(
  *                 example: This topic covers the basics of various design patterns.
  *     responses:
  *       201:
- *         description: Topic created successfully.
+ *         description: A single topic object
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                   example: "123e4567-e89b-12d3-a456-426614174000"
- *                 name:
- *                   type: string
- *                   example: Introduction to Design Patterns
- *                 content:
- *                   type: string
- *                   example: This topic covers the basics of various design patterns.
- *                 createdAt:
- *                   type: string
- *                   format: date-time
- *                   example: "2023-10-27T10:00:00Z"
- *                 updatedAt:
- *                   type: string
- *                   format: date-time
- *                   example: "2023-10-27T10:00:00Z"
- *                 version:
- *                   type: number
- *                   example: 1
+ *               $ref: '#/components/schemas/Topic'
  *       400:
  *         description: Invalid input.
  *         content:

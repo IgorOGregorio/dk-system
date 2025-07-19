@@ -46,20 +46,6 @@ Tests are written using Jest and Supertest. To run the test suite, use the comma
 npm test
 ```
 
-## Project Structure
-
-```
-.gitignore
-package.json
-package-lock.json
-tsconfig.json
-src/
-  server.ts
-  ...
-dist/
-  server.js
-  ...
-```
 
 
 
